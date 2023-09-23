@@ -1,0 +1,53 @@
+# Import required libraries
+import requests
+import json
+from boltiot import Bolt
+import time
+
+# Replace with your Bolt API Key and Device ID
+API_KEY = 'YOUR_BOLT_API_KEY'
+DEVICE_ID = 'YOUR_BOLT_DEVICE_ID'
+
+# Replace with your Twilio Account SID, Auth Token, and Twilio Phone Number
+TWILIO_ACCOUNT_SID = 'YOUR_TWILIO_ACCOUNT_SID'
+TWILIO_AUTH_TOKEN = 'YOUR_TWILIO_AUTH_TOKEN'
+TWILIO_PHONE_NUMBER = 'YOUR_TWILIO_PHONE_NUMBER'
+USER_PHONE_NUMBER = 'RECIPIENT_PHONE_NUMBER'
+
+# Initialize Bolt
+mybolt = Bolt(API_KEY, DEVICE_ID)
+
+# Function to send SMS using Twilio
+def send_sms(message):
+    url = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
+    data = {
+        "From": TWILIO_PHONE_NUMBER,
+        "To": USER_PHONE_NUMBER,
+        "Body": message,
+    }
+    auth = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    
+    try:
+        response = requests.post(url, data=data, auth=auth)
+        response.raise_for_status()
+        print("SMS sent successfully.")
+    except Exception as e:
+        print("Error sending SMS:", str(e))
+
+# Main loop
+while True:
+    try:
+        # Read gyro sensor data and NEO-6M GPS data here
+        gyro_data = 0  # Replace with actual gyro data retrieval code
+        gps_data = "Latitude: XX.XXXXXX, Longitude: XX.XXXXXX"  # Replace with actual GPS data retrieval code
+        
+        # Implement your accident detection logic using gyro data here
+        if gyro_data > THRESHOLD:
+            message = f"Accident Detected!\nLocation: {gps_data}"
+            send_sms(message)
+            
+        # Sleep for a few seconds before the next iteration
+        time.sleep(5)
+        
+    except Exception as e:
+        print("Error:", str(e))
